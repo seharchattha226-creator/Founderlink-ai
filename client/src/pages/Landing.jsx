@@ -137,7 +137,7 @@ export default function Landing() {
                       </div>
                     ))}
                     <div className="w-10 h-10 rounded-full border-2 border-[#05030a] bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center z-0 shadow-lg shadow-cyan-500/20">
-                      <span className="text-xs font-black text-white">+15k</span>
+                      <span className="text-[9px] font-black text-white">+15k</span>
                     </div>
                   </div>
                   <div className="flex flex-col">
