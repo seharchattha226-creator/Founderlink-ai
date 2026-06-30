@@ -136,8 +136,8 @@ export default function Landing() {
                         <span className="text-xs font-bold text-slate-200">{name.charAt(0)}</span>
                       </div>
                     ))}
-                    <div className="w-10 h-10 rounded-full border-2 border-[#05030a] bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center z-0 shadow-lg shadow-cyan-500/20 overflow-hidden">
-                      <span className="text-[8px] font-black text-white tracking-tighter">+15k</span>
+                    <div className="w-11 h-11 rounded-full border-2 border-[#05030a] bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center z-0 shadow-lg shadow-cyan-500/20 overflow-hidden">
+                      <span className="text-[9px] font-black text-white tracking-tighter">15k+</span>
                     </div>
                   </div>
                   <div className="flex flex-col">
