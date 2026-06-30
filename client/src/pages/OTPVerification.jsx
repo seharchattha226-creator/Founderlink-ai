@@ -123,16 +123,6 @@ const OTPVerification = () => {
             <p className="text-slate-400 text-xs leading-relaxed">
               We protect your startup data. Access to dashboard configurations requires secure One-Time-Password credentials.
             </p>
-
-            <div className="bg-[#0D0D10]/80 p-4 border border-white/[0.05] rounded-xl flex items-center space-x-3.5">
-              <div className="w-9 h-9 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
-                <ShieldCheck className="h-5 w-5" />
-              </div>
-              <div>
-                <span className="text-[10px] text-slate-500 block uppercase font-bold tracking-wider">Encrypted parameters</span>
-                <span className="text-xs text-white font-bold">256-bit SSL transaction</span>
-              </div>
-            </div>
           </div>
 
           {/* Bottom security assurance */}
