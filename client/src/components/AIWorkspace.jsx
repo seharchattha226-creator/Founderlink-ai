@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { 
   Brain, 
   TrendingUp, 
@@ -20,6 +22,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AIWorkspace() {
+  const { user } = useAuth();
   const [activeFeature, setActiveFeature] = useState(0);
   const [counts, setCounts] = useState({ score: 0, growth: 0, tam: 0 });
 
@@ -161,10 +164,13 @@ export default function AIWorkspace() {
                       <p className="text-slate-300 text-sm leading-relaxed">{feature.description}</p>
                       
                       {/* Action button */}
-                      <button className="mt-6 inline-flex items-center space-x-2 px-5 py-2.5 bg-white/10 hover:bg-white/15 border border-white/10 rounded-xl transition-all duration-300">
+                      <Link 
+                        to={user ? "/ai-tools" : "/register"} 
+                        className="mt-6 inline-flex items-center space-x-2 px-5 py-2.5 bg-white/10 hover:bg-white/15 border border-white/10 rounded-xl transition-all duration-300"
+                      >
                         <span className="text-sm font-semibold text-white">Try Now</span>
                         <ArrowRight className="w-4 h-4 text-white"></ArrowRight>
-                      </button>
+                      </Link>
                     </div>
                   </motion.div>
                 );
@@ -187,15 +193,21 @@ export default function AIWorkspace() {
 
           {/* Quick actions */}
           <div className="grid grid-cols-2 gap-3">
-            <button className="group flex items-center justify-center space-x-2 p-4 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 transition-all duration-300 shadow-lg shadow-purple-500/25">
+            <Link 
+              to={user ? "/dashboard" : "/register"} 
+              className="group flex items-center justify-center space-x-2 p-4 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 transition-all duration-300 shadow-lg shadow-purple-500/25"
+            >
               <Rocket className="w-5 h-5 text-white"></Rocket>
               <span className="text-sm font-bold text-white">Launch Startup</span>
-            </button>
+            </Link>
             
-            <button className="group flex items-center justify-center space-x-2 p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all duration-300">
+            <Link 
+              to={user ? "/ai-tools" : "/register"} 
+              className="group flex items-center justify-center space-x-2 p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all duration-300"
+            >
               <MessageSquare className="w-5 h-5 text-slate-300 group-hover:text-white"></MessageSquare>
               <span className="text-sm font-semibold text-slate-300 group-hover:text-white">AI Chat</span>
-            </button>
+            </Link>
           </div>
 
           {/* Trust indicator */}
