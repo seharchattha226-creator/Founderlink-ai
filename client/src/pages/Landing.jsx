@@ -33,7 +33,7 @@ export default function Landing() {
 
   // Trust metrics
   const trustMetrics = [
-    { value: '15,000+', label: 'Validated Startups' },
+    { value: '15k+', label: 'Validated Startups' },
     { value: '96%', label: 'Founder Satisfaction' },
     { value: '$120M+', label: 'Funding Enabled' },
     { value: '4.9/5', label: 'User Rating' }
@@ -166,7 +166,7 @@ export default function Landing() {
 
                 <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.35, ease: 'easeOut' }} className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6">
                   {trustMetrics.map((metric, i) => (
-                    <div key={i} className="glass-ultra rounded-2xl p-4 sm:p-5 text-center metric-card-glow backdrop-blur-3xl border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-lg hover:shadow-violet-500/10">
+                    <div key={i} className="glass-ultra rounded-2xl p-4 sm:p-5 text-center metric-card-glow backdrop-blur-3xl border border-white/10 hover:border-white/20 transition-all duration-300 hover:shadow-lg hover:shadow-violet-500/10 overflow-hidden">
                       <div className="text-2xl sm:text-3xl font-black text-white">{metric.value}</div>
                       <div className="text-[11px] text-slate-500 uppercase font-semibold tracking-wide mt-1.5">{metric.label}</div>
                     </div>
