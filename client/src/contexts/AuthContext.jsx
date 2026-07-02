@@ -5,6 +5,39 @@ import toast from 'react-hot-toast';
 
 const AuthContext = createContext();
 
+const getErrorMessage = (error, fallback = 'Something went wrong!') => {
+  const data = error.response?.data;
+
+  if (data) {
+    if (typeof data === 'string' && data.trim()) {
+      return data;
+    }
+    if (data.message) {
+      return data.message;
+    }
+    if (data.error) {
+      return data.error;
+    }
+    if (Array.isArray(data.errors) && data.errors[0]?.msg) {
+      return data.errors[0].msg;
+    }
+  }
+
+  if (error.response?.status) {
+    return `Request failed with status ${error.response.status}`;
+  }
+
+  if (error.message === 'Network Error') {
+    return 'Unable to connect to the server. Please ensure the backend is running.';
+  }
+
+  if (error.message) {
+    return error.message;
+  }
+
+  return fallback;
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token'));
@@ -59,11 +92,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Registration error:', error);
       
-      // Extract error message from backend response
-      const errorMessage = error.response?.data?.message || 
-                          error.response?.data?.error || 
-                          error.response?.data?.errors?.[0]?.msg ||
-                          'Something went wrong!';
+      const errorMessage = getErrorMessage(error);
       toast.error(errorMessage);
       throw new Error(errorMessage, { cause: error });
     }
@@ -84,9 +113,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('OTP verification error:', error);
       
-      const errorMessage = error.response?.data?.message || 
-                          error.response?.data?.error ||
-                          'Something went wrong!';
+      const errorMessage = getErrorMessage(error);
       toast.error(errorMessage);
       throw new Error(errorMessage, { cause: error });
     }
@@ -100,9 +127,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Resend OTP error:', error);
       
-      const errorMessage = error.response?.data?.message || 
-                          error.response?.data?.error ||
-                          'Something went wrong!';
+      const errorMessage = getErrorMessage(error);
       toast.error(errorMessage);
       throw new Error(errorMessage, { cause: error });
     }
@@ -122,10 +147,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Login error:', error);
       
-      // Extract error message from backend response
-      const errorMessage = error.response?.data?.message || 
-                          error.response?.data?.error || 
-                          'Something went wrong!';
+      const errorMessage = getErrorMessage(error);
       toast.error(errorMessage);
       throw new Error(errorMessage, { cause: error });
     }
@@ -196,9 +218,7 @@ export const AuthProvider = ({ children }) => {
       setUser(data.user);
       toast.success('Welcome!');
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 
-                           error.response?.data?.error || 
-                           'Authentication failed';
+      const errorMessage = getErrorMessage(error, 'Authentication failed');
       toast.error(errorMessage);
       throw error;
     }
