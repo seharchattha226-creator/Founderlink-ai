@@ -1,19 +1,22 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, Sparkles } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Menu, X, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import Logo from './Logo';
+import { DURATION, EASING, STAGGER, fadeInUp, useMotionPref } from '../utils/motion';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { shouldAnimate } = useMotionPref();
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 30);
+      setScrolled(window.scrollY > 40);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -31,168 +34,282 @@ export default function Navbar() {
     { name: 'Contact', href: '/contact' }
   ];
 
+  const isActive = (href) => {
+    if (href.startsWith('#')) {
+      return location.pathname === '/' && location.hash === href;
+    }
+    return location.pathname === href;
+  };
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
+
+  const buttonVariants = {
+    rest: { scale: 1 },
+    hover: { scale: 1.01 },
+    tap: { scale: 0.99 },
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 sm:pt-7">
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
+          initial={shouldAnimate ? { opacity: 0, y: -12 } : {}}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
-          className={`
-            glass-ultra rounded-3xl px-6 sm:px-8 py-4
-            flex items-center justify-between
-            transition-all duration-500
-            ${scrolled 
-              ? 'shadow-2xl border-white/15' 
-              : 'shadow-xl border-white/10'
-            }
-          `}
+          transition={{ 
+            duration: DURATION.slow, 
+            ease: EASING.easeOut 
+          }}
+          className={`relative flex items-center justify-between rounded-2xl border transition-all ${
+            scrolled
+              ? 'bg-bg-primary/80 backdrop-blur-xl border-border/70 py-2.5 px-5 sm:px-6 shadow-lg'
+              : 'bg-bg-surface/90 border-border/50 py-3.5 px-5 sm:px-6 shadow-sm'
+          }`}
+          style={{ transitionDuration: `${DURATION.normal}s`, transitionTimingFunction: EASING.easeOut }}
         >
           {/* Logo */}
-          <Link 
-            to="/" 
-            className="flex items-center space-x-3 group"
+          <Link
+            to="/"
+            className="flex items-center gap-3 group"
           >
-            <div className="relative">
+            <motion.div
+              whileHover={{ scale: shouldAnimate ? 1.04 : 1 }}
+              transition={{ duration: DURATION.fast, ease: EASING.easeOut }}
+            >
               <Logo size="normal" />
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-cyan-500/20 rounded-xl blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </div>
-            <span className="text-xl font-black tracking-tight relative">
-              <span className="text-white">FounderLink</span>
-              <span className="bg-gradient-to-r from-purple-400 via-indigo-400 to-cyan-400 bg-clip-text text-transparent">
-                .ai
-              </span>
+            </motion.div>
+            <span className="text-base sm:text-lg font-semibold tracking-tight">
+              <span className="text-text-primary">FounderLink</span>
+              <span className="text-primary">.ai</span>
             </span>
           </Link>
 
           {/* Desktop Links */}
-          <div className="hidden md:flex items-center space-x-1">
+          <div className="hidden md:flex items-center gap-1.5">
             {navLinks.map((link, index) => (
               <Link
                 key={link.name}
                 to={link.href}
-                className="group relative px-5 py-2.5 text-sm font-semibold text-slate-300 hover:text-white transition-colors"
+                className={`relative px-4 py-2.5 text-sm font-medium transition-colors ${
+                  isActive(link.href)
+                    ? 'text-text-primary'
+                    : 'text-text-secondary hover:text-text-primary'
+                }`}
+                style={{ transitionDuration: `${DURATION.fast}s`, transitionTimingFunction: EASING.easeOut }}
               >
-                <span className="relative z-10">{link.name}</span>
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-purple-500 to-cyan-500 transition-all duration-300 group-hover:w-full" />
+                {link.name}
+                {isActive(link.href) && (
+                  <motion.div
+                    layoutId="activeNavIndicator"
+                    className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-primary"
+                    transition={{ 
+                      duration: DURATION.normal, 
+                      ease: EASING.easeOut,
+                      type: 'spring',
+                      stiffness: 400,
+                      damping: 35
+                    }}
+                  />
+                )}
               </Link>
             ))}
-            
-            <div className="h-8 w-px bg-gradient-to-b from-transparent via-slate-500/30 to-transparent mx-2" />
+
+            <div className="h-6 w-px bg-border mx-3" />
 
             {user ? (
-              <div className="flex items-center space-x-3">
-                <Link 
-                  to="/dashboard" 
-                  className="px-5 py-2.5 text-sm font-semibold text-slate-300 hover:text-white transition-colors rounded-xl hover:bg-white/5"
+              <div className="flex items-center gap-2">
+                <Link
+                  to="/dashboard"
+                  className="px-4 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary transition-colors"
+                  style={{ transitionDuration: `${DURATION.fast}s`, transitionTimingFunction: EASING.easeOut }}
                 >
                   Dashboard
                 </Link>
-                <button 
+                <button
                   onClick={handleLogout}
-                  className="px-5 py-2.5 text-sm font-semibold text-slate-400 hover:text-white transition-colors rounded-xl hover:bg-white/5"
+                  className="px-4 py-2.5 text-sm font-medium text-text-tertiary hover:text-text-primary transition-colors"
+                  style={{ transitionDuration: `${DURATION.fast}s`, transitionTimingFunction: EASING.easeOut }}
                 >
                   Logout
                 </button>
               </div>
             ) : (
-              <div className="flex items-center space-x-3">
-                <Link 
-                  to="/login" 
-                  className="px-5 py-2.5 text-sm font-semibold text-slate-300 hover:text-white transition-colors rounded-xl hover:bg-white/5"
+              <div className="flex items-center gap-2">
+                <Link
+                  to="/login"
+                  className="px-4 py-2.5 text-sm font-medium text-text-secondary hover:text-text-primary transition-colors"
+                  style={{ transitionDuration: `${DURATION.fast}s`, transitionTimingFunction: EASING.easeOut }}
                 >
                   Sign In
                 </Link>
-                <Link 
-                  to="/register" 
-                  className="group relative overflow-hidden px-6 py-2.5 rounded-2xl text-sm font-black text-white transition-all duration-300"
+                <motion.div
+                  variants={buttonVariants}
+                  initial="rest"
+                  whileHover="hover"
+                  whileTap="tap"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-600 bg-[length:200%_200%] animate-[btn-gradient-shift_5s_ease_infinite]" />
-                  <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="relative z-10 flex items-center space-x-2">
-                    <Sparkles className="w-4 h-4" />
-                    <span>Start Building Free</span>
-                  </div>
-                </Link>
+                  <Link
+                    to="/register"
+                    className="group inline-flex items-center gap-2 bg-primary text-bg-primary rounded-xl px-4 py-2.5 text-sm font-medium transition-colors hover:bg-primary/90"
+                    style={{ transitionDuration: `${DURATION.fast}s`, transitionTimingFunction: EASING.easeOut }}
+                  >
+                    <Zap className="w-4 h-4" />
+                    Get Started
+                  </Link>
+                </motion.div>
               </div>
             )}
           </div>
 
           {/* Mobile Menu Button */}
-          <button 
-            className="md:hidden p-2.5 rounded-xl hover:bg-white/5 transition-colors text-slate-200"
+          <motion.button
+            whileHover={shouldAnimate ? { scale: 1.05 } : {}}
+            whileTap={shouldAnimate ? { scale: 0.97 } : {}}
+            className="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-xl border border-border bg-bg-elevated hover:bg-bg-primary transition-colors"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+            style={{ transitionDuration: `${DURATION.fast}s`, transitionTimingFunction: EASING.easeOut }}
           >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={mobileMenuOpen ? "close" : "open"}
+                initial={shouldAnimate ? { opacity: 0, rotate: -45 } : {}}
+                animate={{ opacity: 1, rotate: 0 }}
+                exit={shouldAnimate ? { opacity: 0, rotate: 45 } : {}}
+                transition={{ 
+                  duration: DURATION.fast, 
+                  ease: EASING.easeOut 
+                }}
+              >
+                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </motion.div>
+            </AnimatePresence>
+          </motion.button>
         </motion.div>
       </div>
 
       {/* Mobile Menu */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="md:hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4"
-          >
-            <div className="glass-ultra rounded-3xl p-6 border-white/10">
-              <div className="flex flex-col space-y-3">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.name}
-                    to={link.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="px-4 py-3 text-lg font-semibold text-slate-200 hover:text-white hover:bg-white/5 rounded-xl transition-all"
-                  >
-                    {link.name}
-                  </Link>
-                ))}
-                
-                <div className="my-3 h-px bg-gradient-to-r from-transparent via-slate-500/40 to-transparent" />
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={shouldAnimate ? { opacity: 0 } : {}}
+              animate={{ opacity: 1 }}
+              exit={shouldAnimate ? { opacity: 0 } : {}}
+              transition={{ 
+                duration: DURATION.fast, 
+                ease: EASING.easeOut 
+              }}
+              className="md:hidden fixed inset-0 bg-black/40 backdrop-blur-sm"
+              onClick={() => setMobileMenuOpen(false)}
+            />
+            {/* Menu Content */}
+            <motion.div
+              initial={shouldAnimate ? { opacity: 0, y: -12 } : {}}
+              animate={{ opacity: 1, y: 0 }}
+              exit={shouldAnimate ? { opacity: 0, y: -12 } : {}}
+              transition={{ 
+                duration: DURATION.normal, 
+                ease: EASING.easeOut 
+              }}
+              className="md:hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4"
+            >
+              <div className="bg-bg-surface border border-border rounded-2xl p-5 sm:p-6 shadow-xl">
+                <motion.div 
+                  className="flex flex-col gap-2"
+                  variants={{
+                    animate: {
+                      transition: {
+                        staggerChildren: STAGGER.fast,
+                      }
+                    }
+                  }}
+                  initial="initial"
+                  animate="animate"
+                >
+                  {navLinks.map((link) => (
+                    <motion.div key={link.name} {...fadeInUp}>
+                      <Link
+                        to={link.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={`px-4 py-3.5 text-sm font-medium rounded-xl transition-colors ${
+                          isActive(link.href)
+                            ? 'bg-bg-elevated text-text-primary'
+                            : 'text-text-secondary hover:text-text-primary hover:bg-bg-elevated/50'
+                        }`}
+                        style={{ transitionDuration: `${DURATION.fast}s`, transitionTimingFunction: EASING.easeOut }}
+                      >
+                        {link.name}
+                      </Link>
+                    </motion.div>
+                  ))}
 
-                {user ? (
-                  <>
-                    <Link 
-                      to="/dashboard" 
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="px-4 py-3 text-lg font-semibold text-slate-200 hover:text-white hover:bg-white/5 rounded-xl transition-all"
-                    >
-                      Dashboard
-                    </Link>
-                    <button 
-                      onClick={() => {
-                        handleLogout();
-                        setMobileMenuOpen(false);
-                      }}
-                      className="px-4 py-3 text-lg font-semibold text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all text-left"
-                    >
-                      Logout
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <Link 
-                      to="/login" 
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="px-4 py-3 text-lg font-semibold text-slate-200 hover:text-white hover:bg-white/5 rounded-xl transition-all"
-                    >
-                      Sign In
-                    </Link>
-                    <Link 
-                      to="/register" 
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="mt-2 btn-primary-gradient text-center px-6 py-3.5 rounded-2xl text-sm font-black text-white"
-                    >
-                      Start Building Free
-                    </Link>
-                  </>
-                )}
+                  <div className="my-2 h-px bg-border" />
+
+                  {user ? (
+                    <>
+                      <motion.div {...fadeInUp}>
+                        <Link
+                          to="/dashboard"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="px-4 py-3.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-bg-elevated/50 rounded-xl transition-colors"
+                          style={{ transitionDuration: `${DURATION.fast}s`, transitionTimingFunction: EASING.easeOut }}
+                        >
+                          Dashboard
+                        </Link>
+                      </motion.div>
+                      <motion.div {...fadeInUp}>
+                        <button
+                          onClick={() => {
+                            handleLogout();
+                            setMobileMenuOpen(false);
+                          }}
+                          className="px-4 py-3.5 text-sm font-medium text-text-tertiary hover:text-text-primary hover:bg-bg-elevated/50 rounded-xl transition-colors text-left"
+                          style={{ transitionDuration: `${DURATION.fast}s`, transitionTimingFunction: EASING.easeOut }}
+                        >
+                          Logout
+                        </button>
+                      </motion.div>
+                    </>
+                  ) : (
+                    <>
+                      <motion.div {...fadeInUp}>
+                        <Link
+                          to="/login"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="px-4 py-3.5 text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-bg-elevated/50 rounded-xl transition-colors"
+                          style={{ transitionDuration: `${DURATION.fast}s`, transitionTimingFunction: EASING.easeOut }}
+                        >
+                          Sign In
+                        </Link>
+                      </motion.div>
+                      <motion.div {...fadeInUp}>
+                        <Link
+                          to="/register"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="mt-2 inline-flex items-center justify-center gap-2 bg-primary text-bg-primary rounded-xl px-4 py-3.5 text-sm font-medium transition-colors hover:bg-primary/90"
+                          style={{ transitionDuration: `${DURATION.fast}s`, transitionTimingFunction: EASING.easeOut }}
+                        >
+                          <Zap className="w-4 h-4" />
+                          Get Started
+                        </Link>
+                      </motion.div>
+                    </>
+                  )}
+                </motion.div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </nav>

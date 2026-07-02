@@ -15,6 +15,7 @@ import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import DesignSystemPreview from './components/DesignSystemPreview';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -51,7 +52,8 @@ function AppContent() {
         }}
       />
       <Routes>
-        <Route path="/" element={<Landing />} />
+        <Route path="/" element={<DesignSystemPreview />} />
+        <Route path="/landing" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/verify-otp" element={<OTPVerification />} />
