@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import Logo from './Logo';
 
 export default function SplashScreen({ appLoading, onComplete }) {
   const [progress, setProgress] = useState(0);
@@ -21,18 +20,18 @@ export default function SplashScreen({ appLoading, onComplete }) {
     return () => observer.disconnect();
   }, []);
 
-  // Sleek progress bar calculation and updates
+  // Accelerated progress bar calculation and updates
   useEffect(() => {
     const startTime = Date.now();
-    const minimumDuration = 1600; // 1.6s minimum duration for premium feel
+    const minimumDuration = 600; // 0.6s minimum duration for snappy, fast feel
     
     const interval = setInterval(() => {
       const elapsed = Date.now() - startTime;
       
-      // Calculate normal progress up to 90% over 1.2s
+      // Calculate normal progress up to 90% over 400ms
       let targetProgress = 0;
-      if (elapsed < 1200) {
-        targetProgress = (elapsed / 1200) * 90;
+      if (elapsed < 400) {
+        targetProgress = (elapsed / 400) * 90;
       } else {
         // Hold at 95% if application is still loading
         targetProgress = appLoading ? 95 : 100;
@@ -46,35 +45,33 @@ export default function SplashScreen({ appLoading, onComplete }) {
       // Smooth step increment
       setProgress((prev) => {
         if (prev >= targetProgress) return prev;
-        // Increment slowly so it feels continuous
-        const step = (targetProgress - prev) * 0.15;
-        const next = prev + Math.max(step, 0.5);
+        // Increment faster
+        const step = (targetProgress - prev) * 0.28;
+        const next = prev + Math.max(step, 1.5);
         return Math.min(next, targetProgress);
       });
 
-      // Finish condition
-      if (!appLoading && elapsed >= minimumDuration + 200 && progress >= 99.5) {
+      // Finish condition (accelerated timers)
+      if (!appLoading && elapsed >= minimumDuration + 100 && progress >= 99.2) {
         setProgress(100);
         clearInterval(interval);
         setTimeout(() => {
           if (onComplete) onComplete();
-        }, 150); // slight buffer to show 100% completed
+        }, 80); // ultra-fast buffer to show 100% completed
       }
-    }, 25);
+    }, 20);
 
     return () => clearInterval(interval);
   }, [appLoading, onComplete, progress]);
 
-  // Loading text messages based on progress
+  // Loading text messages based on progress (shortened & updated for speed)
   useEffect(() => {
-    if (progress < 25) {
-      setLoadingText('Connecting to secure gateway...');
-    } else if (progress < 50) {
-      setLoadingText('Syncing neural workspace state...');
-    } else if (progress < 75) {
-      setLoadingText('Loading AI core components...');
-    } else if (progress < 95) {
-      setLoadingText('Verifying credential tokens...');
+    if (progress < 30) {
+      setLoadingText('Connecting...');
+    } else if (progress < 60) {
+      setLoadingText('Syncing workspace...');
+    } else if (progress < 90) {
+      setLoadingText('Loading AI components...');
     } else {
       setLoadingText('Ready');
     }
@@ -85,9 +82,9 @@ export default function SplashScreen({ appLoading, onComplete }) {
       initial={{ opacity: 1 }}
       exit={{
         opacity: 0,
-        scale: 1.03,
-        filter: 'blur(8px)',
-        transition: { duration: 0.65, ease: [0.25, 0.46, 0.45, 0.94] }
+        scale: 1.02,
+        filter: 'blur(4px)',
+        transition: { duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }
       }}
       className={`fixed inset-0 w-screen h-screen z-[99999] flex flex-col items-center justify-center overflow-hidden transition-colors duration-500 ${
         isDark ? 'bg-[#0B0B0F]' : 'bg-[#FAF9F6]'
@@ -99,7 +96,7 @@ export default function SplashScreen({ appLoading, onComplete }) {
       {/* Premium Glowing Background Aura */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <div
-          className={`w-[600px] h-[600px] rounded-full blur-[150px] opacity-25 transition-all duration-700 ${
+          className={`w-[500px] h-[500px] rounded-full blur-[130px] opacity-20 transition-all duration-700 ${
             isDark
               ? 'bg-gradient-to-tr from-[#00D4FF]/20 to-[#00E5A8]/10'
               : 'bg-gradient-to-tr from-[#00D4FF]/8 to-[#00E5A8]/5'
@@ -109,32 +106,16 @@ export default function SplashScreen({ appLoading, onComplete }) {
 
       {/* Content Container */}
       <div className="relative z-10 flex flex-col items-center justify-center px-6 text-center select-none">
-        {/* Brand Logo Wrapper */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.85 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{
-            duration: 0.8,
-            ease: [0.16, 1, 0.3, 1], // premium custom ease-out
-          }}
-          className="mb-6 relative flex items-center justify-center"
-        >
-          {/* Logo element glow */}
-          <div className="absolute -inset-4 bg-gradient-to-r from-[#00D4FF] to-[#00E5A8] opacity-25 blur-xl rounded-full animate-pulse-soft" />
-          
-          <Logo size="huge" animated={true} />
-        </motion.div>
-
         {/* Website Name */}
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{
-            delay: 0.15,
-            duration: 0.8,
+            delay: 0.05,
+            duration: 0.5,
             ease: [0.16, 1, 0.3, 1],
           }}
-          className="mb-8"
+          className="mb-6"
         >
           <h1
             className={`text-3xl sm:text-4xl font-semibold tracking-tight ${
@@ -150,8 +131,8 @@ export default function SplashScreen({ appLoading, onComplete }) {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.35, duration: 0.5 }}
-          className="w-full max-w-[200px] flex flex-col items-center"
+          transition={{ delay: 0.1, duration: 0.3 }}
+          className="w-full max-w-[160px] flex flex-col items-center"
         >
           {/* Progress bar track */}
           <div
@@ -161,16 +142,16 @@ export default function SplashScreen({ appLoading, onComplete }) {
           >
             {/* Animated progress bar fill */}
             <div
-              className="absolute top-0 left-0 h-full rounded-full bg-gradient-to-r from-[#00D4FF] to-[#00E5A8] shadow-[0_0_8px_rgba(0,212,255,0.8)] transition-all duration-100 ease-out"
+              className="absolute top-0 left-0 h-full rounded-full bg-gradient-to-r from-[#00D4FF] to-[#00E5A8] shadow-[0_0_6px_rgba(0,212,255,0.7)] transition-all duration-75 ease-out"
               style={{ width: `${progress}%` }}
             />
           </div>
 
           {/* Dynamic Loading Text */}
           <span
-            className={`mt-4 text-[11px] font-medium tracking-[0.1em] uppercase ${
+            className={`mt-3 text-[10px] font-semibold tracking-[0.12em] uppercase ${
               isDark ? 'text-text-secondary' : 'text-[#52525B]'
-            } h-4 transition-all duration-300`}
+            } h-4 transition-all duration-200`}
           >
             {loadingText}
           </span>
